@@ -1,0 +1,83 @@
+def dls(graph, start, goal, limit, path):
+    """
+    Performs a recursive Depth-Limited Search (DLS).
+    
+    Args:
+        graph: A dictionary representing the graph.
+        start: The starting node for the current search.
+        goal: The target node to find.
+        limit: The current depth limit.
+        path: The list representing the path from the start node.
+    
+    Returns:
+        The path to the goal if found, otherwise None.
+    """
+    # Add the current node to the path
+    path.append(start)
+    
+    # Check if the current node is the goal
+    if start == goal:
+        return path
+    
+    # Check if the depth limit has been reached
+    if limit <= 0:
+        return None
+    
+    # Explore neighbors
+    if start in graph:
+        for neighbor in graph[start]:
+            result = dls(graph, neighbor, goal, limit - 1, path)
+            if result is not None:
+                return result
+    
+    # If the goal is not found in this branch, backtrack by removing the node
+    path.pop()
+    return None
+
+def iddfs(graph, start, goal, max_depth):
+    """
+    Performs an Iterative Deepening Depth-First Search (IDDFS).
+    
+    Args:
+        graph: A dictionary representing the graph.
+        start: The starting node for the search.
+        goal: The target node to find.
+        max_depth: The maximum depth to search.
+        
+    Returns:
+        The path to the goal if found, otherwise an informative message.
+    """
+    for depth in range(max_depth + 1):
+        print(f"Searching with depth limit: {depth}")
+        path = dls(graph, start, goal, depth, [])
+        if path is not None:
+            print("Goal found!")
+            return path
+    
+    return "Goal not found within the specified maximum depth."
+
+# Example Usage
+if __name__ == '__main__':
+    # Define a graph
+    graph = {
+        'A': ['B', 'C'],
+        'B': ['D', 'E', ''],
+        'C': ['F', 'G'],
+        'D': ['H'],
+        'E': ['I'],
+        'F': [],
+        'G': [],
+        'H': [],
+        'I': []
+    }
+    
+    start_node = 'A'
+    goal_node = 'G'
+    max_depth = 3
+    
+    solution_path = iddfs(graph, start_node, goal_node, max_depth)
+    
+    if isinstance(solution_path, list):
+        print("\nPath found:", ' -> '.join(solution_path))
+    else:
+        print(solution_path)
