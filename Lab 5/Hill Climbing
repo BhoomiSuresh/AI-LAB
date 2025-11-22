@@ -1,0 +1,67 @@
+import random
+
+def calculate_attacks(board):
+    """Calculates the number of attacking pairs on the board."""
+    n = len(board)
+    attacks = 0
+    for i in range(n):
+        for j in range(i + 1, n):
+            # Check row attacks
+            if board[i] == board[j]:
+                attacks += 1
+            # Check diagonal attacks
+            elif abs(board[i] - board[j]) == abs(i - j):
+                attacks += 1
+    return attacks
+
+def hill_climbing_n_queens(n):
+    """Solves the N-Queens problem using Hill Climbing."""
+    # Initialize with a random board
+    current_board = [random.randint(0, n - 1) for _ in range(n)]
+    current_attacks = calculate_attacks(current_board)
+
+    while current_attacks > 0:
+        best_neighbor_board = list(current_board)
+        best_neighbor_attacks = current_attacks
+
+        found_better_neighbor = False
+        for col_to_move in range(n):
+            for row_new_pos in range(n):
+                if current_board[col_to_move] == row_new_pos:
+                    continue  # Don't move to the same position
+
+                temp_board = list(current_board)
+                temp_board[col_to_move] = row_new_pos
+                temp_attacks = calculate_attacks(temp_board)
+
+                if temp_attacks < best_neighbor_attacks:
+                    best_neighbor_attacks = temp_attacks
+                    best_neighbor_board = list(temp_board)
+                    found_better_neighbor = True
+                elif temp_attacks == best_neighbor_attacks and not found_better_neighbor:
+                    # If multiple neighbors have the same best attack count,
+                    # choose one randomly to avoid always picking the same one
+                    if random.random() < 0.5: # Simple tie-breaking
+                        best_neighbor_board = list(temp_board)
+
+        if not found_better_neighbor:
+            # Stuck in a local optimum or reached a solution
+            break
+       
+        current_board = best_neighbor_board
+        current_attacks = best_neighbor_attacks
+
+    return current_board, current_attacks
+
+# Example for 4-Queens
+n = 4
+solution, attacks = hill_climbing_n_queens(n)
+
+print(f"Final board: {solution}")
+print(f"Number of attacks: {attacks}")
+
+if attacks == 0:
+    print("Solution found!")
+else:
+    print("Stuck in a local optimum.")
+
